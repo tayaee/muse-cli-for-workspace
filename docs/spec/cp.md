@@ -7,10 +7,10 @@ Detailed specification for the `cp` command, used to copy files and directories 
 ## 1. Overview & Syntax
 
 ```bash
-# 1) Download (Workspace ➔ Local)
+# 1) Download (Workspace -> Local)
 muse-cli-w cp [OPTIONS] muse:REMOTE_SRC... LOCAL_DEST
 
-# 2) Upload (Local ➔ Workspace)
+# 2) Upload (Local -> Workspace)
 muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
 ```
 
@@ -55,7 +55,7 @@ muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
 | Feature | Gateway Method | Payload / Invocation Rules |
 | :--- | :--- | :--- |
 | Check file existence | `fs.stat` | `{"path": "<relative path>"}` (used to determine skip condition) |
-| Download file | `fs.read` | `{"path": "<path>", "offset": <n>, "len": <chunk>}` ➔ decode base64 |
+| Download file | `fs.read` | `{"path": "<path>", "offset": <n>, "len": <chunk>}` -> decode base64 |
 | Upload file | `fs.write` | `{"path": "<path>", "overwrite": bool, "create_parent": true, "data_base64": "<b64>"}` |
 
 ### Path Normalization Rules
@@ -65,9 +65,9 @@ muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
 
 ## 5. Usage Scenarios & Examples
 
-### 5.1. Download (Workspace ➔ Local)
+### 5.1. Download (Workspace -> Local)
 ```bash
-# ⭐️ Batch download / sync entire Workspace (most common use case)
+# Batch download / sync entire Workspace (most common use case)
 muse-cli-w cp -r muse:./ ./workspace/
 # Or download directly into current working directory:
 muse-cli-w cp -r muse:./ ./
@@ -92,7 +92,7 @@ muse-cli-w cp --media ./media/
 muse-cli-w cp --artifacts ./artifacts/
 ```
 
-### 5.2. Upload (Local ➔ Workspace)
+### 5.2. Upload (Local -> Workspace)
 ```bash
 # Single file upload
 muse-cli-w cp photo.png muse:images/

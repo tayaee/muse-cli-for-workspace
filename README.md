@@ -32,7 +32,7 @@ muse-cli-w --help
 
 ## Quick Start
 
-A typical end-to-end workflow (request generation ➔ list ➔ download ➔ upload):
+A typical end-to-end workflow (request generation -> list -> download -> upload):
 
 ### 1) Request chart generation from Muse agent
 Ask the agent to find/generate a stock chart image and snapshot information, saving them into a date-structured directory:
