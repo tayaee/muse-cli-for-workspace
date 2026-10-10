@@ -84,4 +84,4 @@ For comprehensive command options (`-f`, `-v`, `--format json`, `--media`, `--ar
 
 - [Listing (`ls`) Specification](docs/spec/ls.md): Directory navigation, JSON output formatting, and smart preset views
 - [Copying (`cp`) Specification](docs/spec/cp.md): Recursive sync, force overwrite (`-f`), verbose output (`-v`), and batch preset downloads
-- [Low-Level Gateway Recipes](muse-cli.recipes.md): Direct invocations of `muse-cli raw fs.*` APIs
+- [Low-Level Gateway Recipes](docs/muse-cli.recipes.md): Direct invocations of `muse-cli raw fs.*` APIs
