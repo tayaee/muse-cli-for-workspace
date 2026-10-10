@@ -60,22 +60,6 @@ muse-cli-w cp -r muse:downloads/ticker/AAPL ~/muse/workspace/downloads/ticker/AA
 # Or download a specific snapshot file directly
 muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png ./
 ```
-*Example Output (1st run - copied):*
-```text
-+ muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.json /home/user1/muse/workspace/downloads/ticker/AAPL/2026/10/09/snapshot.json
-+ muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png /home/user1/muse/workspace/downloads/ticker/AAPL/2026/10/09/snapshot.png
-```
-*Example Output (2nd run - skipped by default):*
-```text
-+ muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.json /home/user1/muse/workspace/downloads/ticker/AAPL/2026/10/09/snapshot.json (skipped)
-+ muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png /home/user1/muse/workspace/downloads/ticker/AAPL/2026/10/09/snapshot.png (skipped)
-```
-
-> **Logging Options:**
-> - `-q`: Omit `(skipped)` notifications.
-> - `--quiet`: Completely silent transfer (suppress both copied and skipped messages).
-> - `-v`: Show developer debug logs (`[debug] ...`).
-> - `-f`: Force overwrite existing files.
 
 Verify downloaded files locally:
 ```bash

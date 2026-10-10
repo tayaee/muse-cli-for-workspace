@@ -309,10 +309,16 @@ def do_cp_upload(
                 if not recursive:
                     print(f"omitting directory '{m}' (use -r to copy recursively)", file=sys.stderr)
                     continue
+                dest_top_name = Path(dest_path).name
+                src_top_name = mp.name
+                trailing_slash = m.endswith("/") or m.endswith(os.sep)
+                same_name = (dest_top_name == src_top_name)
+                nest = (len(matched) > 1) or (not same_name and not trailing_slash and dest_is_dir)
+                base_dir = mp.parent if nest else mp
                 for root, _, files in os.walk(mp):
                     for file in files:
                         full_p = Path(root) / file
-                        rel_p = full_p.relative_to(mp.parent if len(matched) == 1 else mp)
+                        rel_p = full_p.relative_to(base_dir)
                         expanded_files.append((full_p, rel_p))
             elif mp.is_file():
                 expanded_files.append((mp, Path(mp.name)))
@@ -375,9 +381,14 @@ def do_cp_download(
                 dest_is_dir = True
                 dir_entries = list_remote_recursive(r_path)
                 top_name = Path(r_path).name
+
+                trailing_slash = s.endswith("/") or s.endswith(os.sep)
+                same_name = (local_dest.name == top_name)
+                should_nest = dest_already_dir and not same_name and not trailing_slash
+
                 for child_rel, _ in dir_entries:
                     full_rem = f"{r_path.rstrip('/')}/{child_rel}"
-                    if dest_already_dir:
+                    if should_nest:
                         rel_out = Path(top_name) / child_rel
                     else:
                         rel_out = Path(child_rel)
