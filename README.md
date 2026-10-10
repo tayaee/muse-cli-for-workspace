@@ -7,7 +7,7 @@ A CLI tool for seamless file synchronization and asset management between Muse A
 ## Quick Installation
 
 ### 1) Prerequisite: `muse-cli`
-This tool interacts with the Muse AI cloud through [`muse-cli`](https://github.com/muse-ai/muse-cli). Please refer to the official [`muse-cli` repository](https://github.com/muse-ai/muse-cli) for installation instructions.
+This tool interacts with the Muse AI cloud through [`muse-cli`](https://github.com/muse-ai/muse-cli). Please refer to the [`muse-cli` repository](https://github.com/muse-ai/muse-cli) for installation instructions.
 
 Verify connectivity to your Muse agent:
 ```bash
