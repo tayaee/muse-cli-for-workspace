@@ -59,8 +59,8 @@ muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
 | Upload file | `fs.write` | `{"path": "<path>", "overwrite": bool, "create_parent": true, "data_base64": "<b64>"}` |
 
 ### Path Normalization Rules
-- **Workspace as Remote CWD**: Relative paths (e.g. `muse:spaces`, `muse:downloads/ticker/`) automatically resolve inside `workspace/`.
-- **VM Root Access**: Absolute-style paths prefixed with `muse:/` (e.g. `muse:/memory`, `muse:/IDENTITY.md`) resolve directly from the VM root.
+- **Workspace as Remote CWD**: Relative paths (e.g. `muse:spaces/`, `muse:downloads/ticker/`) automatically resolve inside `workspace/`.
+- **VM Root Access**: Absolute-style paths prefixed with `muse:/` (e.g. `muse:/memory/`, `muse:/IDENTITY.md`, `muse:/`) resolve directly from the VM root.
 - **Explicit `workspace/`**: Paths starting with `workspace/` or `muse:workspace/` are preserved without double-nesting.
 
 ## 5. Usage Scenarios & Examples
@@ -68,12 +68,12 @@ muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
 ### 5.1. Download (Workspace ➔ Local)
 ```bash
 # ⭐️ Batch download / sync entire Workspace (most common use case)
-muse-cli-w cp -r muse:. ./workspace/
+muse-cli-w cp -r muse:./ ./workspace/
 # Or download directly into current working directory:
-muse-cli-w cp -r muse:. ./
+muse-cli-w cp -r muse:./ ./
 
 # Show detailed progress including skipped files (-v)
-muse-cli-w cp -r -v muse:. ./workspace/
+muse-cli-w cp -r -v muse:./ ./workspace/
 
 # Single file download
 muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png ./
@@ -85,7 +85,7 @@ muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png ./aapl-snapshot
 muse-cli-w cp "muse:avatars/*.webp" ./avatars/
 
 # Recursive subdirectory download
-muse-cli-w cp -r muse:avatars ./avatars/
+muse-cli-w cp -r muse:avatars/ ./avatars/
 
 # Batch download presets
 muse-cli-w cp --media ./media/
@@ -95,17 +95,17 @@ muse-cli-w cp --artifacts ./artifacts/
 ### 5.2. Upload (Local ➔ Workspace)
 ```bash
 # Single file upload
-muse-cli-w cp photo.png muse:workspace/images/
+muse-cli-w cp photo.png muse:images/
 
 # Multi-file wildcard upload
-muse-cli-w cp *.png muse:workspace/images/
+muse-cli-w cp *.png muse:images/
 
 # Recursive directory upload (-r)
-muse-cli-w cp -r ./my_folder muse:workspace/
+muse-cli-w cp -r ./my_folder/ muse:workspace/
 
 # Force overwrite (-f)
-muse-cli-w cp -f photo.png muse:workspace/images/
+muse-cli-w cp -f photo.png muse:images/
 
 # Verbose directory upload (-v)
-muse-cli-w cp -r -v ./my_folder muse:workspace/
+muse-cli-w cp -r -v ./my_folder/ muse:workspace/
 ```

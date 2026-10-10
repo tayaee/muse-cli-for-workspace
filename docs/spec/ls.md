@@ -38,8 +38,8 @@ muse-cli-w ls [OPTIONS] [PATH]
 | Preset listing (`--media`, `--artifacts`, `--recent`) | `fs.library` | `{"preset": "media" \| "artifacts" \| "recents"}` |
 
 ### Path Normalization Rules
-- **Workspace as Remote CWD**: Relative paths (e.g. `spaces`, `downloads/ticker`) automatically resolve under `workspace/`.
-- **VM Root Access**: Absolute-style paths prefixed with `muse:/` (e.g. `muse:/memory`, `muse:/IDENTITY.md`, `muse:/`) resolve directly from the VM root.
+- **Workspace as Remote CWD**: Relative paths (e.g. `spaces/`, `downloads/ticker/`) automatically resolve under `workspace/`.
+- **VM Root Access**: Absolute-style paths prefixed with `muse:/` (e.g. `muse:/memory/`, `muse:/IDENTITY.md`, `muse:/`) resolve directly from the VM root.
 - **Output Formats**:
   - Default: Unix `ls -1aF` format (one entry per line, trailing `/` for directories, no trailing character for files).
   - Detailed (`-l`): Unix `ls -l` format (`drwxr-xr-x 2 muse muse 4096 <ISO-8601-time> <name>`).
@@ -55,21 +55,21 @@ muse-cli-w ls [OPTIONS] [PATH]
 muse-cli-w ls
 
 # Detailed long listing (ls -l style)
-muse-cli-w ls -l downloads/ticker/AAPL/2026/10/09
+muse-cli-w ls -l downloads/ticker/AAPL/2026/10/09/
 
 # Browse specific subdirectories
-muse-cli-w ls downloads/ticker/AAPL/2026/10/09
-muse-cli-w ls muse:avatars
+muse-cli-w ls downloads/ticker/AAPL/2026/10/09/
+muse-cli-w ls muse:avatars/
 
 # Recursively browse subdirectories (-R / -r)
-muse-cli-w ls -R downloads/ticker/AAPL
+muse-cli-w ls -R downloads/ticker/AAPL/
 ```
 
 ### 4.2. JSON Output (`--format json`)
 Outputs raw JSON formatted data for programmatic automation and pipeline processing.
 ```bash
 muse-cli-w ls --format json
-muse-cli-w ls workspace/charts --format json
+muse-cli-w ls charts/ --format json
 ```
 
 ### 4.3. Smart Preset Views

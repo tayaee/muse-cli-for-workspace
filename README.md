@@ -43,7 +43,7 @@ muse-cli send "Search for AAPL 2026-10-09 stock chart image and information and 
 ### 2) List files (`ls`)
 Verify that the generated snapshot files exist in the workspace (supports recursive listing with `-R`):
 ```bash
-muse-cli-w ls downloads/ticker/AAPL/2026/10/09
+muse-cli-w ls downloads/ticker/AAPL/2026/10/09/
 ```
 *Example Output:*
 ```text
@@ -55,7 +55,7 @@ snapshot.png
 Download files from the remote workspace to your local machine (remote paths start with `muse:` prefix):
 ```bash
 # Sync ticker directory recursively to your local folder
-muse-cli-w cp -r muse:downloads/ticker/AAPL ~/muse/workspace/downloads/ticker/AAPL
+muse-cli-w cp -r muse:downloads/ticker/AAPL/ ~/muse/workspace/downloads/ticker/AAPL/
 
 # Or download a specific snapshot file directly
 muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png ./
@@ -63,7 +63,7 @@ muse-cli-w cp muse:downloads/ticker/AAPL/2026/10/09/snapshot.png ./
 
 Verify downloaded files locally:
 ```bash
-ls -lR ~/muse/workspace/downloads/ticker/AAPL
+ls -lR ~/muse/workspace/downloads/ticker/AAPL/
 ```
 
 ### 4) Upload files (`cp`)
@@ -81,8 +81,8 @@ muse-cli-w cp tests/report-2026-10-09.md muse:uploads/reports/2026/10/
 ## Remote Path Resolution (Workspace as CWD)
 
 By default, `muse-cli-w` treats the remote `workspace/` directory as its current working directory (CWD):
-- **Relative paths** (e.g. `spaces`, `downloads/ticker/`, `muse:downloads/ticker/`) automatically resolve inside `workspace/`. You don't need to type `workspace/` repeatedly!
-- **Absolute paths with `muse:/`** (e.g. `muse:/memory`, `muse:/IDENTITY.md`, `muse:/`) provide direct access to VM root system files and directories.
+- **Relative paths** (e.g. `spaces/`, `downloads/ticker/`, `muse:downloads/ticker/`) automatically resolve inside `workspace/`. You don't need to type `workspace/` repeatedly!
+- **Absolute paths with `muse:/`** (e.g. `muse:/memory/`, `muse:/IDENTITY.md`, `muse:/`) provide direct access to VM root system files and directories.
 - Explicit `muse:workspace/...` paths remain fully supported for backward compatibility.
 
 ---
