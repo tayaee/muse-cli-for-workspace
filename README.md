@@ -78,15 +78,6 @@ muse-cli-w cp tests/report-2026-10-09.md muse:uploads/reports/2026/10/
 
 ---
 
-## Remote Path Resolution (Workspace as CWD)
-
-By default, `muse-cli-w` treats the remote `workspace/` directory as its current working directory (CWD):
-- **Relative paths** (e.g. `spaces/`, `downloads/ticker/`, `muse:downloads/ticker/`) automatically resolve inside `workspace/`. You don't need to type `workspace/` repeatedly!
-- **Absolute paths with `muse:/`** (e.g. `muse:/memory/`, `muse:/IDENTITY.md`, `muse:/`) provide direct access to VM root system files and directories.
-- Explicit `muse:workspace/...` paths remain fully supported for backward compatibility.
-
----
-
 ## Specifications & Detailed Manuals
 
 For comprehensive command options (`-f`, `-v`, `--format json`, `--media`, `--artifacts`, etc.) and internal gateway mapping details, see the dedicated documentation:
