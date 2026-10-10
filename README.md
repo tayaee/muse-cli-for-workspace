@@ -18,10 +18,10 @@ muse-cli status
 Install `muse-cli-w` via [`uv`](https://github.com/astral-sh/uv):
 ```bash
 # From cloned repository directory
-uv tool install . --force
+uv tool install -e . --force
 
 # Or directly from Git repository
-uv tool install git+https://github.com/tayaee/muse-cli-for-workspace.git --force
+uv tool install https://github.com/tayaee/muse-cli-for-workspace.git --force
 ```
 Verify installation:
 ```bash
