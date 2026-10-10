@@ -1,0 +1,21 @@
+[project]
+name = "muse-cli-w"
+version = "0.1.0"
+description = "cp-style file transfer utility between Local and Muse AI workspace"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "tayaee" },
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/tayaee/muse-cli-for-workspace"
+Repository = "https://github.com/tayaee/muse-cli-for-workspace.git"
+
+[project.scripts]
+muse-cli-w = "muse_cli_w.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
