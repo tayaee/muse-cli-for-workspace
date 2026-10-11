@@ -24,9 +24,11 @@ Usage:
   muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
   muse-cli-w cp -r [OPTIONS] LOCAL_DIR muse:REMOTE_DEST
 
-  # 4. Print remote file content (내용 출력)
+  # 4. Print remote file content (내용 출력, Windows: type)
   muse-cli-w cat FILE
   muse-cli-w type FILE
+
+  # Windows-style names (동일 동작): copy (= cp), dir (= ls -l), type (= cat)
 
 Options:
   -r, -R, --recursive   Copy directories recursively
@@ -46,6 +48,34 @@ from pathlib import Path
 
 CHUNK_SIZE = 32 * 1024  # 32KB chunks to comply with Noise protocol 65,535-byte frame limit
 REMOTE_PREFIXES = ("muse:", "muse://")
+
+# Platform command mapping. Help always shows both groups.
+LINUX_COMMANDS = ("cp", "ls", "cat")
+WINDOWS_COMMANDS = ("copy", "dir", "type")
+
+
+class PlatformHelpFormatter(argparse.HelpFormatter):
+    """Show subcommands grouped by platform. Both groups are always displayed."""
+
+    def _format_action(self, action):
+        if isinstance(action, argparse._SubParsersAction):
+            return self._format_subparsers_by_platform(action)
+        return super()._format_action(action)
+
+    def _format_subparsers_by_platform(self, action):
+        help_by_name = {a.dest: a.help for a in action._choices_actions}
+        width = max(len(n) for n in LINUX_COMMANDS + WINDOWS_COMMANDS)
+        # NOTE: the section heading ("positional arguments:") is emitted by
+        # the section itself, so only emit the platform groups here.
+        lines = []
+        for group_title, names in (
+            ("For Windows", WINDOWS_COMMANDS),
+            ("For Linux", LINUX_COMMANDS),
+        ):
+            lines.append(f"  {group_title}:")
+            for name in names:
+                lines.append(f"    {name:<{width}}  {help_by_name.get(name, '')}")
+        return "\n".join(lines) + "\n\n"
 
 
 def is_remote(path: str) -> bool:
@@ -627,20 +657,26 @@ def main():
     parser = argparse.ArgumentParser(
         prog="muse-cli-w",
         description="cp-style file transfer utility between Local and Muse AI workspace",
+        formatter_class=PlatformHelpFormatter,
     )
-    sub = parser.add_subparsers(dest="subcommand")
+    sub = parser.add_subparsers(dest="subcommand", metavar="<command>")
 
-    # cp command
-    p_cp = sub.add_parser("cp", help="Copy files between local and muse (e.g. cp file.png muse:workspace/)")
-    p_cp.add_argument("-r", "-R", "--recursive", action="store_true", help="Copy directories recursively")
-    p_cp.add_argument("-f", "--force", action="store_true", help="Overwrite existing files without prompt")
-    p_cp.add_argument("-q", dest="omit_skipped", action="store_true", help="Omit (skipped) messages")
-    p_cp.add_argument("--quiet", dest="quiet", action="store_true", help="Suppress all messages including copied files")
-    p_cp.add_argument("-v", "--verbose", action="store_true", help="Debug logging for developers")
-    p_cp.add_argument("-m", "--media", action="store_true", help="Download media preset")
-    p_cp.add_argument("-a", "--artifacts", action="store_true", help="Download artifacts preset")
-    p_cp.add_argument("paths", nargs="*", metavar="PATH", help="SOURCE... DEST (use 'muse:' prefix for remote)")
-    p_cp.set_defaults(func=cmd_cp)
+    # cp/copy command (cp on Linux, copy on Windows; identical behavior)
+    for _cmd in ("cp", "copy"):
+        if _cmd == "cp":
+            _help = "Copy files between local and muse (e.g. cp file.png muse:workspace/)"
+        else:
+            _help = "Copy files between local and muse (same as cp)"
+        p_cp = sub.add_parser(_cmd, help=_help)
+        p_cp.add_argument("-r", "-R", "--recursive", action="store_true", help="Copy directories recursively")
+        p_cp.add_argument("-f", "--force", action="store_true", help="Overwrite existing files without prompt")
+        p_cp.add_argument("-q", dest="omit_skipped", action="store_true", help="Omit (skipped) messages")
+        p_cp.add_argument("--quiet", dest="quiet", action="store_true", help="Suppress all messages including copied files")
+        p_cp.add_argument("-v", "--verbose", action="store_true", help="Debug logging for developers")
+        p_cp.add_argument("-m", "--media", action="store_true", help="Download media preset")
+        p_cp.add_argument("-a", "--artifacts", action="store_true", help="Download artifacts preset")
+        p_cp.add_argument("paths", nargs="*", metavar="PATH", help="SOURCE... DEST (use 'muse:' prefix for remote)")
+        p_cp.set_defaults(func=cmd_cp)
 
     # ls command
     p_ls = sub.add_parser("ls", help="List files in Muse workspace directory")
@@ -664,15 +700,20 @@ def main():
     p_dir.add_argument("--format", choices=["text", "json"], default="text", help="Output format (text, json)")
     p_dir.set_defaults(func=cmd_ls, long=True)
 
-    # cat/type command (aliases: cat on Unix, type on Windows)
-    p_cat = sub.add_parser("cat", aliases=["type"], help="Print remote file content to stdout")
-    p_cat.add_argument("path", help="Remote file path (e.g. muse:notes/todo.md)")
-    p_cat.add_argument("-v", "--verbose", action="store_true", help="Debug logging for developers")
-    p_cat.set_defaults(func=cmd_cat)
+    # cat/type command (cat on Linux, type on Windows; identical behavior)
+    for _cmd in ("cat", "type"):
+        if _cmd == "cat":
+            _help = "Print remote file content to stdout"
+        else:
+            _help = "Print remote file content to stdout (same as cat)"
+        p_cat = sub.add_parser(_cmd, help=_help)
+        p_cat.add_argument("path", help="Remote file path (e.g. muse:notes/todo.md)")
+        p_cat.add_argument("-v", "--verbose", action="store_true", help="Debug logging for developers")
+        p_cat.set_defaults(func=cmd_cat)
 
     # If first arg is not a known subcommand or help, assume 'cp' by default
     argv = sys.argv[1:]
-    if argv and argv[0] not in ("-h", "--help", "cp", "ls", "dir", "cat", "type", "upload", "download"):
+    if argv and argv[0] not in ("-h", "--help", "cp", "copy", "ls", "dir", "cat", "type", "upload", "download"):
         argv = ["cp"] + argv
 
     args = parser.parse_args(argv)
