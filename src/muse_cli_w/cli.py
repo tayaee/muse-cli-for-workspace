@@ -10,6 +10,10 @@ Usage:
   muse-cli-w ls --recent
   muse-cli-w ls --format json
 
+  # 1b. Detailed listing (same as ls -l)
+  muse-cli-w dir [muse:workspace]
+  muse-cli-w dir -R [muse:workspace]
+
   # 2. Download from workspace (다운로드)
   muse-cli-w cp [OPTIONS] muse:REMOTE_SRC... LOCAL_DEST
   muse-cli-w cp -r [OPTIONS] muse:REMOTE_DIR LOCAL_DEST
@@ -19,6 +23,10 @@ Usage:
   # 3. Upload to workspace (업로드)
   muse-cli-w cp [OPTIONS] LOCAL_SRC... muse:REMOTE_DEST
   muse-cli-w cp -r [OPTIONS] LOCAL_DIR muse:REMOTE_DEST
+
+  # 4. Print remote file content (내용 출력)
+  muse-cli-w cat FILE
+  muse-cli-w type FILE
 
 Options:
   -r, -R, --recursive   Copy directories recursively
@@ -487,6 +495,59 @@ def handle_ls_not_found(path_str: str):
     sys.exit(2)
 
 
+def cmd_cat(args):
+    """Dump remote file content to stdout. Directory input is an error."""
+    raw_path = args.path
+    target = to_remote_path(raw_path)
+    verbose = getattr(args, "verbose", False)
+
+    stat_res = stat_remote(target)
+    if verbose:
+        print(f"[debug] stat_remote('{target}') = {stat_res}", file=sys.stderr)
+    if stat_res is None:
+        print(f"muse-cli-w cat: '{raw_path}': No such file or directory", file=sys.stderr)
+        sys.exit(1)
+    if stat_res.get("kind") in ("directory", "dir"):
+        print(f"muse-cli-w cat: '{raw_path}': Is a directory", file=sys.stderr)
+        sys.exit(1)
+
+    remote_size = stat_res.get("size", 0) or 0
+    offset = 0
+    out = getattr(sys.stdout, "buffer", sys.stdout)
+    while True:
+        cur_len = min(CHUNK_SIZE, remote_size - offset) if remote_size > 0 else CHUNK_SIZE
+        if cur_len <= 0 and offset > 0:
+            break
+
+        if verbose:
+            print(f"[debug] fs.read chunk offset={offset} len={cur_len} (remote_size {remote_size})", file=sys.stderr)
+
+        body = {"path": target, "offset": offset, "len": cur_len}
+        try:
+            read_res = call_gateway("fs.read", body)
+        except Exception as e:
+            print(f"muse-cli-w cat: '{raw_path}': {e}", file=sys.stderr)
+            sys.exit(1)
+
+        res_data = read_res.get("result", {})
+        b64_part = res_data.get("data_base64")
+        if b64_part:
+            chunk_bytes = base64.b64decode(b64_part)
+            if isinstance(out, type(sys.stdout)):
+                out.write(chunk_bytes.decode("utf-8", errors="replace"))
+            else:
+                out.write(chunk_bytes)
+            offset += len(chunk_bytes)
+
+        if res_data.get("eof") or not b64_part or (remote_size > 0 and offset >= remote_size):
+            break
+
+    try:
+        out.flush()
+    except Exception:
+        pass
+
+
 def cmd_ls(args):
     """List entries in a remote workspace path or preset."""
     if args.media:
@@ -592,9 +653,26 @@ def main():
     p_ls.add_argument("--format", choices=["text", "json"], default="text", help="Output format (text, json)")
     p_ls.set_defaults(func=cmd_ls)
 
+    # dir command (Windows-style alias, same behavior as ls -l)
+    p_dir = sub.add_parser("dir", help="List files in long format (same as ls -l)")
+    p_dir.add_argument("path", nargs="?", default="", help="Remote path (default: workspace root)")
+    p_dir.add_argument("-r", "-R", "--recursive", action="store_true", help="List subdirectories recursively")
+    p_dir.add_argument("--media", action="store_true", help="List media preset")
+    p_dir.add_argument("--artifacts", action="store_true", help="List artifacts preset")
+    p_dir.add_argument("--recent", action="store_true", help="List recents preset")
+    p_dir.add_argument("-l", "--long", action="store_true", default=True, help="Show long metadata (always enabled for dir)")
+    p_dir.add_argument("--format", choices=["text", "json"], default="text", help="Output format (text, json)")
+    p_dir.set_defaults(func=cmd_ls, long=True)
+
+    # cat/type command (aliases: cat on Unix, type on Windows)
+    p_cat = sub.add_parser("cat", aliases=["type"], help="Print remote file content to stdout")
+    p_cat.add_argument("path", help="Remote file path (e.g. muse:notes/todo.md)")
+    p_cat.add_argument("-v", "--verbose", action="store_true", help="Debug logging for developers")
+    p_cat.set_defaults(func=cmd_cat)
+
     # If first arg is not a known subcommand or help, assume 'cp' by default
     argv = sys.argv[1:]
-    if argv and argv[0] not in ("-h", "--help", "cp", "ls", "upload", "download"):
+    if argv and argv[0] not in ("-h", "--help", "cp", "ls", "dir", "cat", "type", "upload", "download"):
         argv = ["cp"] + argv
 
     args = parser.parse_args(argv)
